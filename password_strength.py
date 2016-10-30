@@ -48,27 +48,27 @@ pswd_min_strength = 1
 pswd_max_strength = 10
 
 def check_for_one_digit(password):
-    return True if search('\d', password) is not None else False
+    return bool(search('\d', password))
 
 
 def check_for_many_digits(password):
-    return True if search('\d{2}', password) is not None else False
+    return bool(search('\d{2}', password))
 
 
 def check_for_upper_and_lower_case_letters(password):
-    return False if password.islower() or password.isupper() else True
+    return bool(password.islower() or password.isupper())
 
 
 def check_for_one_special_symbol(password):
-    return True if search(r'\W', password) is not None else False
+    return bool(search(r'\W', password))
 
 
 def check_for_many_special_symbols(password):
-    return True if not search(r'\W{2}', password) is None else False
+    return bool(search(r'\W{2}', password))
 
 
 def check_pswd_is_digit(password):
-    return True if password.isdigit() else False
+    return bool(password.isdigit())
 
 
 def get_password_strength(password):
@@ -106,9 +106,9 @@ def get_password_strength(password):
 
 def compare_with_common_passwords_dictionary(password, pswd_list):
     for bad_password in pswd_list:
-        if fullmatch(bad_password.rstrip('\n'), password):
+        if fullmatch(bad_password, password):
             return pswd_min_strength
-        if match(bad_password.rstrip('\n'), password):
+        if match(bad_password, password):
             return get_password_strength(password.strip(bad_password))
     return get_password_strength(password)
 
@@ -116,7 +116,10 @@ def compare_with_common_passwords_dictionary(password, pswd_list):
 def load_password_dict(filepath):
     if exists(filepath):
         with open(filepath, 'r') as file_handler:
-            return file_handler.readlines()
+            pswd_list = file_handler.readlines()
+        clean_pswd_list = [pswd.rstrip('\n') for pswd in pswd_list]
+        return clean_pswd_list
+
 
 
 def choose_dictionary_with_common_passwords():
@@ -130,5 +133,6 @@ def choose_dictionary_with_common_passwords():
 
 if __name__ == '__main__':
     password = getpass(u"Введите свой пароль:")
-    print(u"Защищенность вашего пароля %i из 10" %
+    print(u"Защищенность вашего пароля %i из 10" % 
           compare_with_common_passwords_dictionary(password, choose_dictionary_with_common_passwords()))
+
